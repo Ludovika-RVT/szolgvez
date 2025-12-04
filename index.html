@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RVT Szolgálattervezet V6.7 - Presence & Security</title>
+    <title>RVT UTILS V7.5 - Integrated System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -19,6 +19,26 @@
             border-bottom: 4px solid #42a5f5; 
         }
         
+        /* MENU STYLES */
+        .main-menu-container {
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        .menu-btn-lg {
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            border-radius: 10px;
+        }
+        .menu-btn-lg:hover { transform: translateY(-3px); }
+        .menu-btn-primary { background: linear-gradient(45deg, #0d47a1, #42a5f5); color: white; border: none; }
+        .menu-btn-secondary { background: #e9ecef; color: #6c757d; border: 1px solid #ced4da; }
+        .menu-btn-active-sub { background: linear-gradient(45deg, #d32f2f, #ef5350); color: white; border: none; } 
+        .menu-btn-warning { background: linear-gradient(45deg, #f0932b, #ffbe76); color: white; border: none; font-size: 1rem; padding: 15px; }
+
         /* ICON LOGO STYLE */
         .gun-icon { margin-right: 10px; vertical-align: middle; color: #fff; }
         .gun-icon-login { color: #0d47a1; margin-bottom: 15px; }
@@ -27,7 +47,7 @@
         .online-list { font-size: 0.75rem; color: #bbdefb; margin-top: 2px; }
         .online-dot { color: #00e676; font-size: 8px; vertical-align: middle; margin-right: 2px; }
 
-        /* TABLE STYLES */
+        /* TABLE STYLES (ROSTER) */
         .roster-table th, .roster-table td { 
             text-align: center; vertical-align: middle; padding: 4px 2px;
             white-space: nowrap; border: 1px solid #dee2e6; position: relative;
@@ -75,6 +95,18 @@
         }
         .name-col:hover { text-decoration: underline; background-color: #f8f9fa; }
 
+        /* TASK MANAGER STYLES - UPDATED FOR PRIORITY */
+        .task-card { margin-bottom: 10px; transition: all 0.2s; border-left-width: 6px; border-left-style: solid; }
+        .task-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .task-priority-RED { border-left-color: #dc3545; } /* Azonnalos */
+        .task-priority-YELLOW { border-left-color: #ffc107; } /* Soron kívül */
+        .task-priority-BLUE { border-left-color: #0d6efd; } /* Általános */
+        
+        .task-done { border-left-color: #198754 !important; opacity: 0.7; background-color: #d1e7dd; } /* Kész - Zöld */
+        .task-done .task-title { text-decoration: line-through; }
+        .task-badge { font-size: 0.7em; padding: 4px 8px; border-radius: 12px; }
+
         /* LOGIN SCREEN & OVERLAYS */
         #loginOverlay, #loadingOverlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -90,6 +122,12 @@
         .cloud-sync { color: #f1c40f; }
         .cloud-error { color: #e74c3c; }
 
+        /* HISTORY LOG */
+        .log-entry { font-size: 0.8rem; border-bottom: 1px solid #eee; padding: 8px 0; }
+        .log-time { color: #888; font-size: 0.75rem; }
+        .log-user { font-weight: bold; color: #0d47a1; }
+        .log-diff { font-family: monospace; color: #d63384; display: block; background: #f8f9fa; padding: 2px 5px; border-radius: 4px; margin-top: 2px; }
+
         /* PRINT SETTINGS (A3 Landscape - Scaled Down) */
         #printHeader, #printFooter { display: none; }
         .print-hidden-row { display: none !important; } 
@@ -103,16 +141,16 @@
                 zoom: 65%; /* SKÁLÁZÁS A LAPHOZ */
                 font-family: 'Verdana', sans-serif; 
             }
-            #mainApp > .header-bg, #loginOverlay, #loadingOverlay, .cloud-status, .no-print, .nav-tabs, #alertPlace, .modal { display: none !important; }
+            #mainApp > .header-bg, #mainMenu, #taskApp, #loginOverlay, #loadingOverlay, .cloud-status, .no-print, .nav-tabs, #alertPlace, .modal { display: none !important; }
             .tab-content > .tab-pane { display: none !important; }
-            .tab-content > .active { display: block !important; }
+            /* Force roster to show if printing roster */
+            #mainApp { display: block !important; }
+            #tab-roster { display: block !important; }
             
             #printHeader { display: block; margin-bottom: 20px; text-align: center; }
-            /* Styling for new print header structure */
             #printHeader h2 { font-size: 28px; font-weight: bold; margin: 0; text-transform: uppercase; }
             #printHeader h3 { font-size: 20px; margin: 5px 0 0 0; font-weight: normal; }
             
-            /* Print Footer Styles */
             #printFooter { 
                 display: flex !important; 
                 justify-content: space-between; 
@@ -133,14 +171,12 @@
 </head>
 <body>
 
-    <!-- Loading Overlay -->
     <div id="loadingOverlay">
         <div class="spinner-border text-light mb-3" role="status"></div>
-        <h4>Kapcsolódás a Firebase-hez...</h4>
-        <small class="text-white-50" id="loadingStatusText">Rendszer betöltése...</small>
+        <h4>RVT UTILS rendszer betöltése...</h4>
+        <small class="text-white-50" id="loadingStatusText">Kapcsolódás a Firebase-hez...</small>
     </div>
 
-    <!-- Cloud Status Icon -->
     <div class="cloud-status" id="cloudStatusIcon" title="Adatbázis Státusz">
         <i class="fa-solid fa-circle"></i> <span id="cloudStatusText">Offline</span>
     </div>
@@ -150,12 +186,65 @@
     <div id="loginOverlay" style="display:none;">
         <div class="login-box">
             <i class="fa-solid fa-gun fa-4x gun-icon-login"></i>
-            <h3 class="mb-4 text-primary fw-bold" style="font-family: 'Verdana', sans-serif;">RVT Szolgálattervezet</h3>
+            <h3 class="mb-4 text-primary fw-bold" style="font-family: 'Verdana', sans-serif;">RVT UTILS</h3>
             
             <input type="text" class="form-control mb-2" id="loginUser" placeholder="Felhasználónév">
             <input type="password" class="form-control mb-3" id="loginPass" placeholder="Jelszó">
             <button class="btn btn-primary w-100 fw-bold" onclick="performLogin()">Belépés</button>
-            <div class="mt-3 small text-muted">Cloud V6.7 - Presence & Security</div>
+            <div class="mt-3 small text-muted">V7.5 - Integrated System</div>
+        </div>
+    </div>
+
+    <div id="mainMenu" style="display:none;" class="container main-menu-container">
+        <div class="text-center mb-4">
+            <i class="fa-solid fa-layer-group fa-3x text-primary mb-2"></i>
+            <h2 class="fw-bold text-dark">RVT UTILS</h2>
+            <p class="text-muted" id="menuWelcomeText">Üdvözöllek!</p>
+        </div>
+
+        <div class="d-grid gap-3">
+            <button class="btn menu-btn-lg menu-btn-primary" onclick="openModule('roster')">
+                <i class="fa-solid fa-calendar-days me-2"></i> Szolgálattervezet Modul
+            </button>
+            
+            <button class="btn menu-btn-lg menu-btn-active-sub" onclick="openModule('tasks')">
+                <i class="fa-solid fa-list-check me-2"></i> Feladatkezelő & Elosztó
+            </button>
+            
+            <button class="btn menu-btn-lg menu-btn-warning text-dark fw-bold" onclick="openChangePassModal()">
+                <i class="fa-solid fa-key me-2"></i> Jelszó Módosítás
+            </button>
+            
+            <button class="btn btn-link text-danger mt-3" onclick="performLogout()"><i class="fa-solid fa-power-off"></i> Kijelentkezés</button>
+        </div>
+    </div>
+
+    <div id="taskApp" style="display:none;">
+        <div class="header-bg no-print" style="background-color: #d32f2f; border-color: #ef5350;">
+            <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-light me-3" onclick="openModule('menu')"><i class="fa-solid fa-arrow-left"></i> Menü</button>
+                    <h4 class="m-0 fw-bold"><i class="fa-solid fa-list-check"></i> Feladatkezelő</h4>
+                </div>
+                <div class="text-end">
+                    <span class="fw-bold d-block" id="taskUserInfo"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-secondary">Aktív Feladatok</h5>
+                <button class="btn btn-danger fw-bold admin-only" onclick="openAddTaskModal()"><i class="fa-solid fa-plus"></i> Új Feladat Kiírása</button>
+            </div>
+
+            <div id="activeTasksList" class="mb-5">
+                <div class="text-center text-muted p-4">Nincs aktív feladat.</div>
+            </div>
+
+            <h5 class="fw-bold text-secondary border-top pt-3">Elvégzett / Lezárt Feladatok</h5>
+            <div id="completedTasksList" class="opacity-75">
+                </div>
         </div>
     </div>
 
@@ -163,6 +252,7 @@
         <div class="header-bg no-print">
             <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
+                    <button class="btn btn-sm btn-light me-3" onclick="openModule('menu')"><i class="fa-solid fa-arrow-left"></i> Menü</button>
                     <i class="fa-solid fa-gun fa-2x gun-icon"></i>
                     <h4 class="m-0 fw-bold">RVT Szolgálattervezet</h4>
                     
@@ -179,7 +269,6 @@
                 <div class="text-end">
                     <span class="fw-bold d-block" id="userInfo"></span>
                     <div class="online-list" id="activeUsersList"><i class="fa-solid fa-spinner fa-spin"></i></div>
-                    <button class="btn btn-sm btn-light text-primary fw-bold mt-1" onclick="performLogout()"><i class="fa-solid fa-power-off"></i> Kilépés</button>
                 </div>
             </div>
         </div>
@@ -192,6 +281,7 @@
                 <li class="nav-item admin-only"><button class="nav-link text-primary fw-bold" data-bs-target="#tab-batch" data-bs-toggle="tab"><i class="fa-solid fa-layer-group"></i> Csoportos Rögzítés</button></li>
                 <li class="nav-item admin-only"><button class="nav-link text-danger fw-bold" data-bs-target="#tab-users" data-bs-toggle="tab"><i class="fa-solid fa-user-lock"></i> Jogosultságok & Szabadság</button></li>
                 <li class="nav-item admin-only"><button class="nav-link text-secondary fw-bold" data-bs-target="#tab-settings" data-bs-toggle="tab"><i class="fa-solid fa-calendar-check"></i> Havi Beállítások</button></li>
+                <li class="nav-item admin-only"><button class="nav-link text-info fw-bold" data-bs-target="#tab-history" data-bs-toggle="tab"><i class="fa-solid fa-clock-rotate-left"></i> Történet</button></li>
             </ul>
 
             <div class="tab-content">
@@ -227,7 +317,6 @@
                         Jelmagyarázat: <b>PI</b>: Pihenőidő | <b>PN</b>: Pihenőnap | <b>X</b>: Szabadság | <b>RSZ</b>: Rendkívüli Szab. | <b>B</b>: Beteg | <b>TM</b>: Túlszolg. Megváltás
                     </div>
 
-                    <!-- PRINT FOOTER (Signature) -->
                     <div id="printFooter">
                         <div style="text-align:left;">
                             Budapest, <span id="printDate"></span>
@@ -245,7 +334,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="tab-batch">
-                    <div class="row justify-content-center">
+                     <div class="row justify-content-center">
                         <div class="col-md-8">
                             <div class="card border-primary">
                                 <div class="card-header bg-primary text-white fw-bold">Csoportos / Több napos rögzítés</div>
@@ -295,7 +384,6 @@
                             <span class="badge bg-white text-danger" id="currentAdminYearDisplay"></span>
                         </div>
                         <div class="card-body">
-                            <!-- New User Form -->
                             <div class="row g-2 mb-4 align-items-end border-bottom pb-4">
                                 <div class="col-md-3">
                                     <label class="small text-muted">Teljes Név</label>
@@ -329,7 +417,6 @@
                                 </div>
                             </div>
 
-                            <!-- Batch Quota Tool -->
                             <div class="alert alert-secondary d-flex align-items-center justify-content-between py-2">
                                 <div><i class="fa-solid fa-users-gear"></i> <b>Csoportos Beállítás:</b> Minden felhasználó éves szabadság keretének beállítása:</div>
                                 <div class="input-group w-auto">
@@ -390,14 +477,134 @@
                         </div>
                     </div>
                 </div>
+                
+                <div class="tab-pane fade" id="tab-history">
+                    <div class="card border-info">
+                        <div class="card-header bg-info text-white fw-bold d-flex justify-content-between align-items-center">
+                            <span>Módosítási Történet (Log)</span>
+                            <div class="btn-group admin-only">
+                                <button class="btn btn-sm btn-light text-dark fw-bold" onclick="exportHistoryCSV()"><i class="fa-solid fa-file-csv"></i> Exportálás CSV-be</button>
+                                <button class="btn btn-sm btn-danger fw-bold" onclick="clearHistory()"><i class="fa-solid fa-trash"></i> Történet Törlése</button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                            <div id="historyLogList">
+                                <p class="text-muted text-center">Nincs megjeleníthető adat.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         </div>
     </div>
 
-    <!-- Modals (Edit, Batch, Print, Profile, Sport Stats, Absence Stats) -->
+    <!-- ... Modals ... -->
+    <div class="modal fade" id="changePassModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">Jelszó Módosítás</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Régi Jelszó:</label>
+                        <input type="password" class="form-control" id="cpOldPass">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Új Jelszó:</label>
+                        <input type="password" class="form-control" id="cpNewPass">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Új Jelszó Megerősítése:</label>
+                        <input type="password" class="form-control" id="cpNewPass2">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary fw-bold" onclick="saveNewPassword()">Mentés</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addTaskModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="fa-solid fa-plus"></i> Új Feladat Kiírása</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Feladat Megnevezése:</label>
+                        <input type="text" class="form-control" id="taskTitle" placeholder="Rövid cím...">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Kategória / Prioritás:</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="taskPrio" id="prioRed" value="RED" autocomplete="off">
+                            <label class="btn btn-outline-danger" for="prioRed">Azonnalos (Piros)</label>
+
+                            <input type="radio" class="btn-check" name="taskPrio" id="prioYellow" value="YELLOW" autocomplete="off">
+                            <label class="btn btn-outline-warning text-dark" for="prioYellow">Soron kívül (Sárga)</label>
+
+                            <input type="radio" class="btn-check" name="taskPrio" id="prioBlue" value="BLUE" autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="prioBlue">Általános (Kék)</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Leírás / Email szöveg:</label>
+                        <textarea class="form-control" id="taskDesc" rows="4" placeholder="Részletes leírás..."></textarea>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Határidő Dátum:</label>
+                            <input type="date" class="form-control" id="taskDeadlineDate">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Időpont:</label>
+                            <input type="time" class="form-control" id="taskDeadlineTime" value="12:00">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Felelősök (Több is jelölhető):</label>
+                        <div class="border rounded p-2" style="max-height: 200px; overflow-y: auto;" id="taskMultiSelectDiv">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button>
+                    <button type="button" class="btn btn-danger fw-bold" onclick="saveNewTask()">Kiosztás</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <!-- EDIT MODAL -->
+    <div class="modal fade" id="completeTaskModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Feladat Elvégzése</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="completeTaskId">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Elvégzés módja / Megjegyzés:</label>
+                        <textarea class="form-control" id="completionNote" rows="3" placeholder="Ide írd le, hogyan oldottad meg, vagy mi lett az eredmény..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Mégse</button>
+                    <button type="button" class="btn btn-success fw-bold" onclick="finishTask()">Mentés & Kész</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="editModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -408,6 +615,10 @@
                 <div class="modal-body">
                     <input type="hidden" id="editUserId"><input type="hidden" id="editDay">
                     
+                    <div id="userRestrictMsg" class="alert alert-warning small py-1 mb-2" style="display:none;">
+                         <i class="fa-solid fa-lock"></i> Felhasználóként csak a megjegyzést szerkesztheted.
+                    </div>
+
                     <div id="editModalContent">
                         <div class="mb-3">
                             <label class="form-label fw-bold">Státusz:</label>
@@ -434,7 +645,6 @@
                             <div class="col-6"><label class="text-primary">Túlszolgálat (+):</label><input type="number" class="form-control border-primary" id="overtimeVal" step="0.5"></div>
                         </div>
 
-                        <!-- SPORT FIELD -->
                         <div class="mb-3 bg-light p-2 border rounded">
                             <label class="form-label fw-bold text-primary"><i class="fa-solid fa-dumbbell"></i> Sportfoglalkozás (perc):</label>
                             <input type="number" class="form-control" id="sportTime" placeholder="Pl. 60" min="0">
@@ -456,7 +666,7 @@
         </div>
     </div>
 
-    <!-- BATCH MODAL -->
+    <!-- Other Modals: Batch, Print, Profile, AbsenceStats -->
     <div class="modal fade" id="colBatchModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -493,7 +703,6 @@
         </div>
     </div>
 
-    <!-- PRINT MODAL -->
     <div class="modal fade" id="printModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -515,7 +724,6 @@
         </div>
     </div>
 
-    <!-- USER PROFILE MODAL -->
     <div class="modal fade" id="userProfileModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -544,7 +752,6 @@
                         </div>
                     </div>
 
-                    <!-- ADMIN QUOTA EDIT -->
                     <div id="adminProfilePanel" style="display:none;" class="mb-3 border-top pt-3">
                         <h6 class="fw-bold text-danger"><i class="fa-solid fa-gear"></i> Admin Beállítások</h6>
                         <div class="row g-2">
@@ -583,7 +790,6 @@
         </div>
     </div>
 
-    <!-- ABSENCE & SPORT STATS MODAL (MERGED) -->
     <div class="modal fade" id="absenceStatsModal" tabindex="-1">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -616,7 +822,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- FIREBASE MODULES -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -631,7 +836,7 @@
             appId: "1:559975823630:web:a07f4bce53279e3f75bf5f"
         };
 
-        let app, fsDB; // fsDB = Firestore DB (ne keverjük a db változóval ami a rostert tárolja)
+        let app, fsDB;
         let dataReady = false;
 
         try {
@@ -658,7 +863,7 @@
                     window.users = snap.data().list || [];
                     checkReady();
                 } else {
-                    initializeDefaultDB(); // First run
+                    initializeDefaultDB();
                 }
             });
 
@@ -678,10 +883,30 @@
                 }
             });
 
-             // 4. PRESENCE (Ki van belépve?)
-             onSnapshot(doc(fsDB, "rvt_data", "presence"), (snap) => {
+            // 4. PRESENCE
+            onSnapshot(doc(fsDB, "rvt_data", "presence"), (snap) => {
                 if(snap.exists()) {
                     renderPresence(snap.data());
+                }
+            });
+            
+            // 5. TASKS
+            onSnapshot(doc(fsDB, "rvt_data", "tasks"), (snap) => {
+                if(snap.exists()) {
+                    window.tasks = snap.data().list || [];
+                    if(document.getElementById("taskApp").style.display === "block") {
+                        window.renderTasks();
+                    }
+                }
+            });
+
+            // 6. HISTORY LOG (ÚJ)
+            onSnapshot(doc(fsDB, "rvt_data", "history"), (snap) => {
+                if(snap.exists()) {
+                    window.logs = snap.data().list || [];
+                    if(document.getElementById("tab-history").classList.contains("active")) {
+                        window.renderHistory();
+                    }
                 }
             });
 
@@ -694,39 +919,54 @@
                 statusIcon.className = "cloud-status cloud-ok";
                 statusText.innerText = "Online";
 
-                // Ha be van lépve, frissítsük a nézetet élőben
                 if(window.currentUser) {
-                    // Update current user ref from live data (balance, pass change etc)
                     const liveUser = window.users.find(u => u.id === window.currentUser.id);
                     if(liveUser) window.currentUser = liveUser;
-
-                    window.changePeriod();
-                    window.renderSettings();
-                    window.renderBatchSelect();
+                    // Refresh current view logic
+                    if(document.getElementById("mainApp").style.display === "block") {
+                        window.changePeriod();
+                        window.renderSettings();
+                        window.renderBatchSelect();
+                        if(window.currentUser.role === 'ADMIN') window.renderHistory();
+                    }
+                    if(document.getElementById("taskApp").style.display === "block") {
+                         window.renderTasks();
+                    }
                 }
             }
         }
 
-        // SAVE FUNCTIONS (Global overrides)
+        // SAVE FUNCTIONS
         window.pushData = async function() {
             if(!fsDB) return;
             document.getElementById("cloudStatusText").innerText = "Mentés...";
             try {
-                // Egyszerűség kedvéért mindhárom kollekciót frissítjük
                 await setDoc(doc(fsDB, "rvt_data", "users"), { list: window.users }, { merge: true });
                 await setDoc(doc(fsDB, "rvt_data", "roster"), { data: window.db }, { merge: true });
                 await setDoc(doc(fsDB, "rvt_data", "configs"), { data: window.configs }, { merge: true });
-                
                 document.getElementById("cloudStatusText").innerText = "Online";
-                console.log("Saved to cloud");
             } catch(e) {
                 console.error("Save Error", e);
-                document.getElementById("cloudStatusText").innerText = "Hiba!";
                 alert("Mentési hiba: " + e.message);
             }
         }
 
-        // Presence Heartbeat
+        window.pushTasks = async function() {
+             if(!fsDB) return;
+             try {
+                await setDoc(doc(fsDB, "rvt_data", "tasks"), { list: window.tasks }, { merge: true });
+             } catch(e) { console.error(e); }
+        }
+        
+        window.pushHistory = async function() {
+            if(!fsDB) return;
+            try {
+                // Keep only last 200 logs to prevent bloat
+                if(window.logs.length > 200) window.logs = window.logs.slice(0, 200);
+                await setDoc(doc(fsDB, "rvt_data", "history"), { list: window.logs }, { merge: true });
+            } catch(e) { console.error(e); }
+        }
+
         window.sendHeartbeat = function() {
             if(!fsDB || !window.currentUser) return;
             const uid = window.currentUser.id;
@@ -736,26 +976,25 @@
         }
 
         async function initializeDefaultDB() {
-            console.log("First run init...");
-            // Default user
             const defUsers = [{ id: 1, name: "Admin", login: "admin", pass: "1234", role: "ADMIN", balance: 0, quota: 25, carriedOver: 0 }];
-            
             await setDoc(doc(fsDB, "rvt_data", "users"), { list: defUsers });
             await setDoc(doc(fsDB, "rvt_data", "roster"), { data: {} });
             await setDoc(doc(fsDB, "rvt_data", "configs"), { data: {} });
             await setDoc(doc(fsDB, "rvt_data", "presence"), {});
-            console.log("Defaults created.");
+            await setDoc(doc(fsDB, "rvt_data", "tasks"), { list: [] });
+            await setDoc(doc(fsDB, "rvt_data", "history"), { list: [] });
         }
 
         initFirebaseSync();
     </script>
 
-    <!-- APP LOGIC -->
     <script>
         // --- DATA & STATE ---
         var users = [];
         var db = {}; 
         var configs = {}; 
+        var tasks = []; 
+        var logs = []; // History logs
         var currentUser = null;
         var heartbeatInterval = null;
 
@@ -768,18 +1007,31 @@
             document.getElementById("selMonth").value = new Date().getMonth();
         }
 
+        // --- NAVIGATION LOGIC ---
+        function openModule(moduleName) {
+            document.getElementById("mainMenu").style.display = "none";
+            document.getElementById("mainApp").style.display = "none";
+            document.getElementById("taskApp").style.display = "none";
+
+            if (moduleName === 'menu') {
+                document.getElementById("mainMenu").style.display = "block";
+            } else if (moduleName === 'roster') {
+                document.getElementById("mainApp").style.display = "block";
+                changePeriod(); 
+                if(currentUser.role === 'ADMIN') renderHistory();
+            } else if (moduleName === 'tasks') {
+                document.getElementById("taskApp").style.display = "block";
+                document.getElementById("taskUserInfo").innerText = `${currentUser.name} (${currentUser.role})`;
+                renderTasks();
+            }
+        }
+
         // --- LOGIN & PERMISSIONS ---
         function applyPermissions() {
             const isAdmin = currentUser && currentUser.role === "ADMIN";
-            const isViewer = currentUser && currentUser.role === "VIEWER";
-            
-            // Hide/Show Admin-only Tabs and Elements
-            // Viewers also can't see Admin tabs (same logic as basic users)
             document.querySelectorAll(".admin-only").forEach(el => {
                 el.classList.toggle("hidden-perm", !isAdmin);
             });
-            
-            // Clickable headers for batch edit (Admin only)
             document.querySelectorAll(".clickable-header").forEach(el => {
                 el.style.pointerEvents = isAdmin ? "auto" : "none";
                 el.title = isAdmin ? "Kattints csoportos rögzítéshez!" : "";
@@ -794,14 +1046,14 @@
             if(found) {
                 currentUser = found;
                 document.getElementById("loginOverlay").style.display = "none";
-                document.getElementById("mainApp").style.display = "block";
+                document.getElementById("menuWelcomeText").innerText = `Üdvözöllek, ${currentUser.name}!`;
+                openModule('menu');
+
                 document.getElementById("userInfo").innerText = `Belépve: ${currentUser.name} (${currentUser.role})`;
                 
-                // Start Presence Heartbeat
                 window.sendHeartbeat();
-                heartbeatInterval = setInterval(window.sendHeartbeat, 60000); // Every minute
+                heartbeatInterval = setInterval(window.sendHeartbeat, 60000);
 
-                changePeriod(); 
                 renderSettings();
                 renderBatchSelect();
                 applyPermissions();
@@ -820,32 +1072,277 @@
             if(!presenceData) return;
             const now = Date.now();
             let activeNames = [];
-
             Object.keys(presenceData).forEach(uid => {
                 const p = presenceData[uid];
-                // 5 minute threshold
-                if (now - p.time < 5 * 60 * 1000) {
-                    activeNames.push(p.name);
-                }
+                if (now - p.time < 5 * 60 * 1000) activeNames.push(p.name);
             });
+            if(activeNames.length > 0) container.innerHTML = `<span class="online-dot"><i class="fa-solid fa-circle"></i></span> Jelenleg Online: ` + activeNames.join(", ");
+            else container.innerHTML = "";
+        }
 
-            if(activeNames.length > 0) {
-                container.innerHTML = `<span class="online-dot"><i class="fa-solid fa-circle"></i></span> Jelenleg Online: ` + activeNames.join(", ");
-            } else {
-                container.innerHTML = "";
+        // --- PASSWORD CHANGE (MAIN MENU) ---
+        function openChangePassModal() {
+            document.getElementById("cpOldPass").value = "";
+            document.getElementById("cpNewPass").value = "";
+            document.getElementById("cpNewPass2").value = "";
+            new bootstrap.Modal(document.getElementById('changePassModal')).show();
+        }
+
+        function saveNewPassword() {
+            const oldP = document.getElementById("cpOldPass").value;
+            const newP = document.getElementById("cpNewPass").value;
+            const newP2 = document.getElementById("cpNewPass2").value;
+
+            if(oldP !== currentUser.pass) return alert("A régi jelszó hibás!");
+            if(newP.length < 3) return alert("A jelszó túl rövid!");
+            if(newP !== newP2) return alert("A két új jelszó nem egyezik!");
+
+            // Find user index reference to update global array
+            const idx = users.findIndex(u => u.id === currentUser.id);
+            if(idx !== -1) {
+                users[idx].pass = newP;
+                currentUser.pass = newP; // Update local session
+                if(window.pushData) window.pushData();
+                alert("Jelszó sikeresen megváltoztatva!");
+                bootstrap.Modal.getInstance(document.getElementById('changePassModal')).hide();
             }
         }
 
+        // --- TASK MANAGER LOGIC (MULTI SELECT & PRIORITY) ---
+        function openAddTaskModal() {
+            // Populate user checklist
+            const s = document.getElementById("taskMultiSelectDiv");
+            let html = `
+                <div class="form-check border-bottom pb-1 mb-1">
+                    <input class="form-check-input" type="checkbox" id="chkAll" onchange="toggleTaskAll()">
+                    <label class="form-check-label fw-bold" for="chkAll">MINDENKI</label>
+                </div>
+            `;
+            users.forEach(u => {
+                if(u.role !== "VIEWER") {
+                    html += `
+                    <div class="form-check">
+                        <input class="form-check-input task-user-chk" type="checkbox" value="${u.id}" id="chk_u_${u.id}">
+                        <label class="form-check-label" for="chk_u_${u.id}">${u.name}</label>
+                    </div>`;
+                }
+            });
+            s.innerHTML = html;
+
+            // Default date: tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById("taskDeadlineDate").value = tomorrow.toISOString().split('T')[0];
+            
+            // Reset Priority
+            document.getElementById("prioBlue").checked = true;
+
+            new bootstrap.Modal(document.getElementById('addTaskModal')).show();
+        }
+
+        function toggleTaskAll() {
+            const allChecked = document.getElementById("chkAll").checked;
+            document.querySelectorAll(".task-user-chk").forEach(c => c.checked = allChecked);
+        }
+
+        function saveNewTask() {
+            const title = document.getElementById("taskTitle").value;
+            const desc = document.getElementById("taskDesc").value;
+            const date = document.getElementById("taskDeadlineDate").value;
+            const time = document.getElementById("taskDeadlineTime").value;
+            const priority = document.querySelector('input[name="taskPrio"]:checked').value; // RED, YELLOW, BLUE
+            
+            // Gather selected users
+            let assign = [];
+            const allChecked = document.getElementById("chkAll").checked;
+            
+            if (allChecked) {
+                assign = "ALL";
+            } else {
+                document.querySelectorAll(".task-user-chk:checked").forEach(c => {
+                    assign.push(c.value);
+                });
+            }
+
+            if(!title || !date) return alert("Cím és Dátum kötelező!");
+            if(assign !== "ALL" && assign.length === 0) return alert("Nincs felelős kiválasztva!");
+
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                desc: desc,
+                deadline: `${date} ${time}`,
+                priority: priority,
+                assignedTo: assign, // "ALL" or Array of IDs
+                createdBy: currentUser.name,
+                completions: {} 
+            };
+
+            tasks.push(newTask);
+            if(window.pushTasks) window.pushTasks();
+            
+            bootstrap.Modal.getInstance(document.getElementById('addTaskModal')).hide();
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const activeList = document.getElementById("activeTasksList");
+            const doneList = document.getElementById("completedTasksList");
+            activeList.innerHTML = "";
+            doneList.innerHTML = "";
+            tasks.sort((a,b) => new Date(a.deadline) - new Date(b.deadline));
+
+            let hasActive = false;
+
+            tasks.forEach(t => {
+                // Check Visibility
+                let isAssigned = false;
+                if(t.assignedTo === "ALL") isAssigned = true;
+                else if(Array.isArray(t.assignedTo)) isAssigned = t.assignedTo.includes(String(currentUser.id));
+                else if(t.assignedTo == currentUser.id) isAssigned = true; // Legacy support
+                
+                const isAdmin = (currentUser.role === "ADMIN");
+
+                if(!isAssigned && !isAdmin) return;
+
+                // Status Check
+                const amIDone = t.completions && t.completions[currentUser.id];
+                
+                // Determine Assignment Text
+                let assignText = "Mindenki";
+                if(t.assignedTo !== "ALL") {
+                   if(Array.isArray(t.assignedTo)) {
+                       assignText = t.assignedTo.length + " fő";
+                       if(t.assignedTo.length < 4) {
+                           assignText = t.assignedTo.map(uid => {
+                               const u = users.find(x => x.id == uid);
+                               return u ? u.name : "?";
+                           }).join(", ");
+                       }
+                   } else {
+                       const u = users.find(x => x.id == t.assignedTo);
+                       assignText = u ? u.name : "???";
+                   }
+                }
+
+                // Priority Class & Color
+                let prioClass = `task-priority-${t.priority || 'BLUE'}`;
+                if(amIDone) prioClass = 'task-done';
+
+                const cardHtml = `
+                    <div class="card task-card ${prioClass} shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title fw-bold task-title">${t.title}</h5>
+                                <span class="badge bg-secondary task-badge align-self-start"><i class="fa-solid fa-clock"></i> ${t.deadline.replace('T', ' ')}</span>
+                            </div>
+                            <p class="card-text mb-2 text-muted small" style="white-space: pre-wrap;">${t.desc || 'Nincs leírás'}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <small class="text-primary fw-bold"><i class="fa-solid fa-user"></i> Felelős: ${assignText}</small>
+                                ${getActionButtons(t, amIDone, isAdmin, isAssigned)}
+                            </div>
+                            ${getAdminDetails(t, isAdmin)}
+                        </div>
+                    </div>
+                `;
+
+                if(amIDone) {
+                    doneList.innerHTML += cardHtml; 
+                } else {
+                    hasActive = true;
+                    activeList.innerHTML += cardHtml;
+                }
+            });
+            
+            if(!hasActive) activeList.innerHTML = `<div class="text-center text-muted p-4"><i class="fa-solid fa-check-circle fa-2x mb-2"></i><br>Nincs aktív feladatod!</div>`;
+        }
+
+        function getActionButtons(task, isDone, isAdmin, isAssigned) {
+            if(currentUser.role === "VIEWER") return "";
+            let html = "";
+            if(isAssigned) {
+                if(isDone) {
+                    html += `<button class="btn btn-sm btn-outline-success disabled"><i class="fa-solid fa-check"></i> Elvégezve</button>`;
+                } else {
+                    html += `<button class="btn btn-sm btn-success" onclick="openCompleteModal(${task.id})">Elvégeztem</button>`;
+                }
+            }
+            if(isAdmin) {
+                // Ensure taskId is passed as a safe number/string
+                html += `<button class="btn btn-sm btn-outline-danger ms-2" title="Feladat törlése" onclick="window.deleteTask(${task.id})"><i class="fa-solid fa-trash"></i></button>`;
+            }
+            return html;
+        }
+
+        function getAdminDetails(task, isAdmin) {
+            if(!isAdmin) return "";
+            const doneCount = Object.keys(task.completions || {}).length;
+            let finishedInfo = [];
+            Object.keys(task.completions || {}).forEach(uid => {
+                const u = users.find(x => x.id == uid);
+                const cData = task.completions[uid];
+                let note = "";
+                // Handle new object structure vs old string structure
+                if(typeof cData === 'object') {
+                    note = cData.note ? ` (${cData.note})` : "";
+                }
+                if(u) finishedInfo.push(`${u.name}${note}`);
+            });
+            return `<div class="mt-2 pt-2 border-top small text-muted">
+                Admin Infó: Kész (${doneCount} fő): ${finishedInfo.join(', ') || '-'}
+            </div>`;
+        }
+
+        // NEW: Open Completion Modal
+        function openCompleteModal(taskId) {
+            document.getElementById("completeTaskId").value = taskId;
+            document.getElementById("completionNote").value = "";
+            new bootstrap.Modal(document.getElementById('completeTaskModal')).show();
+        }
+
+        // NEW: Finish Task Logic
+        function finishTask() {
+            const taskId = document.getElementById("completeTaskId").value;
+            const note = document.getElementById("completionNote").value;
+            
+            const task = tasks.find(t => t.id == taskId);
+            if(!task) return;
+            if(!task.completions) task.completions = {};
+            
+            // Store completion as object with note
+            task.completions[currentUser.id] = {
+                date: new Date().toISOString(),
+                note: note
+            };
+            
+            if(window.pushTasks) window.pushTasks();
+            renderTasks();
+            bootstrap.Modal.getInstance(document.getElementById('completeTaskModal')).hide();
+        }
+
+        window.deleteTask = function(taskId) {
+            if(currentUser.role !== "ADMIN") return alert("Ehhez csak Adminnak van jogosultsága!");
+            if(!confirm("Biztosan törlöd a feladatot mindenki számára?")) return;
+            const idx = tasks.findIndex(t => t.id == taskId);
+            if(idx > -1) {
+                tasks.splice(idx, 1);
+                if(window.pushTasks) window.pushTasks();
+                renderTasks();
+            } else {
+                alert("Hiba: Feladat nem található.");
+            }
+        }
 
         // --- BACKUP (JSON) ---
         function exportBackup() {
             if(currentUser.role !== "ADMIN") return alert("Ehhez csak Adminnak van jogosultsága!");
-            const backupData = { timestamp: new Date().toISOString(), version: "6.7-PresenceSecurity", users: users, db: db, configs: configs };
+            const backupData = { timestamp: new Date().toISOString(), version: "7.1-Integrated", users: users, db: db, configs: configs, tasks: tasks, history: logs };
             const dataStr = JSON.stringify(backupData, null, 2);
             const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `rvt_cloud_mentes_${new Date().toISOString().slice(0,10)}.json`;
+            a.href = url; a.download = `rvt_utils_backup_${new Date().toISOString().slice(0,10)}.json`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
 
@@ -858,11 +1355,15 @@
                 try {
                     const importedData = JSON.parse(e.target.result);
                     if (importedData.users && importedData.db) {
-                        if(confirm("FIGYELEM! A betöltés felülírja a felhőben lévő adatokat. Folytatod?")) {
+                        if(confirm("FIGYELEM! A betöltés felülírja a felhőben lévő adatokat (Feladatokat is). Folytatod?")) {
                             users = importedData.users;
                             db = importedData.db;
                             configs = importedData.configs || {};
-                            saveData(); // Pushes to cloud
+                            tasks = importedData.tasks || []; 
+                            logs = importedData.history || [];
+                            if(window.pushData) window.pushData(); 
+                            if(window.pushTasks) window.pushTasks();
+                            if(window.pushHistory) window.pushHistory();
                             alert("Sikeres visszatöltés! Az adatok szinkronizálva.");
                         }
                     } else alert("Hibás fájlstruktúra!");
@@ -872,14 +1373,84 @@
             reader.readAsText(file);
         }
 
-        // --- CORE LOGIC ---
+        // --- HISTORY LOGIC ---
+        function logHistory(targetUserName, dateText, actionType, details = "") {
+            const entry = {
+                ts: Date.now(),
+                actor: currentUser.name,
+                target: targetUserName,
+                date: dateText,
+                action: actionType,
+                details: details // New Field
+            };
+            logs.unshift(entry); // Add to top
+            if(window.pushHistory) window.pushHistory();
+            if(document.getElementById("tab-history").classList.contains("active")) renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById("historyLogList");
+            list.innerHTML = "";
+            if(!logs || logs.length === 0) {
+                list.innerHTML = '<p class="text-muted text-center">Nincs megjeleníthető adat.</p>';
+                return;
+            }
+            logs.forEach(l => {
+                const dateObj = new Date(l.ts);
+                const timeStr = dateObj.toLocaleString('hu-HU');
+                const detailsHtml = l.details ? `<span class="log-diff">${l.details}</span>` : "";
+                list.innerHTML += `
+                    <div class="log-entry">
+                        <div class="d-flex justify-content-between">
+                            <span class="log-user">${l.actor}</span>
+                            <span class="log-time">${timeStr}</span>
+                        </div>
+                        <div>
+                            <span class="fw-bold">${l.action}</span> - 
+                            <span class="text-muted">${l.target} (${l.date})</span>
+                            ${detailsHtml}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        function clearHistory() {
+            if(currentUser.role !== "ADMIN") return alert("Csak Admin törölheti az előzményeket!");
+            if(!confirm("Biztosan TÖRLÖD a teljes módosítási történetet? Ez nem visszavonható.")) return;
+            logs = [];
+            if(window.pushHistory) window.pushHistory();
+            renderHistory();
+        }
+
+        function exportHistoryCSV() {
+             if(currentUser.role !== "ADMIN") return alert("Csak Admin exportálhat!");
+             let csv = "\uFEFFIdőpont;Felhasználó (Aki módosított);Művelet;Célpont;Dátum;Részletek\n";
+             logs.forEach(l => {
+                 const timeStr = new Date(l.ts).toLocaleString('hu-HU');
+                 // Escape semicolons and newlines in details
+                 const cleanDetails = (l.details || "").replace(/;/g, ",").replace(/\n/g, " ");
+                 csv += `${timeStr};${l.actor};${l.action};${l.target};${l.date};${cleanDetails}\n`;
+             });
+             
+             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement('a');
+             a.href = url;
+             a.download = `rvt_history_log_${new Date().toISOString().slice(0,10)}.csv`;
+             document.body.appendChild(a);
+             a.click();
+             document.body.removeChild(a);
+        }
+
+        // --- CORE ROSTER LOGIC ---
         function changePeriod() {
             calculateNormaForUI(true);
             loadConfigForPeriod();
             renderRoster();
             applyPermissions(); 
-            // Also refresh settings if tab is open to show correct stats for year
             if(document.getElementById("tab-users").classList.contains("active")) renderSettings();
+            if(currentUser && currentUser.role === 'ADMIN' && document.getElementById("tab-history").classList.contains("active")) renderHistory();
         }
 
         function getKey() {
@@ -929,6 +1500,97 @@
             document.getElementById("configNorma").value = calculateNorma(y, m, holidays, workWeekends);
         }
 
+        // --- MISSING FUNCTIONS FIXED ---
+        function calculateUsedLeave(uId, year) {
+            let count = 0;
+            for (let m = 1; m <= 12; m++) {
+                const key = `${year}-${m}`;
+                if (db[key] && db[key][uId]) {
+                    Object.values(db[key][uId]).forEach(entry => {
+                        if (entry.type === 'X') count++;
+                    });
+                }
+            }
+            return count;
+        }
+
+        function openUserProfile(uId) {
+            const u = users.find(x => x.id == uId);
+            if(!u) return;
+            document.getElementById("profileUserId").value = u.id;
+            document.getElementById("profileName").innerText = u.name;
+            document.getElementById("profileLogin").innerText = `@${u.login} (${u.role})`;
+            
+            // Stats
+            const y = parseInt(document.getElementById("selYear").value);
+            document.getElementById("profileYear").innerText = y;
+            const used = calculateUsedLeave(u.id, y);
+            const total = (u.quota || 0) + (u.carriedOver || 0);
+            document.getElementById("profileLeaveStats").innerText = `${used} / ${total} nap`;
+            
+            const pct = total > 0 ? (used / total) * 100 : 0;
+            const bar = document.getElementById("profileLeaveProgress");
+            bar.style.width = `${pct}%`;
+            bar.className = `progress-bar ${pct > 100 ? 'bg-danger' : (pct > 80 ? 'bg-warning' : 'bg-success')}`;
+
+            // Admin Panel Visibility
+            const adminPanel = document.getElementById("adminProfilePanel");
+            const adminOverride = document.getElementById("adminOverrideDiv");
+            const oldPassDiv = document.getElementById("oldPassDiv");
+            
+            if(currentUser.role === 'ADMIN') {
+                adminPanel.style.display = "block";
+                document.getElementById("profileQuotaInput").value = u.quota;
+                document.getElementById("profileCarriedInput").value = u.carriedOver;
+                adminOverride.style.display = "block";
+                oldPassDiv.style.display = "none";
+            } else {
+                adminPanel.style.display = "none";
+                adminOverride.style.display = "none";
+                oldPassDiv.style.display = "block";
+            }
+
+            // Reset password fields
+            document.getElementById("profileOldPass").value = "";
+            document.getElementById("profileNewPass").value = "";
+
+            new bootstrap.Modal(document.getElementById('userProfileModal')).show();
+        }
+
+        function saveProfileChanges() {
+            const uId = document.getElementById("profileUserId").value;
+            const uIdx = users.findIndex(x => x.id == uId);
+            if(uIdx === -1) return;
+            
+            const u = users[uIdx];
+            const oldP = document.getElementById("profileOldPass").value;
+            const newP = document.getElementById("profileNewPass").value;
+            
+            // Password logic
+            if (newP) {
+                if(currentUser.role !== 'ADMIN') {
+                     if(oldP !== u.pass) return alert("Hibás régi jelszó!");
+                }
+                users[uIdx].pass = newP;
+                // update session if self
+                if(currentUser.id == uId) currentUser.pass = newP;
+                alert("Jelszó módosítva!");
+            }
+
+            // Admin config logic
+            if(currentUser.role === 'ADMIN') {
+                 const q = parseInt(document.getElementById("profileQuotaInput").value);
+                 const c = parseInt(document.getElementById("profileCarriedInput").value);
+                 users[uIdx].quota = q;
+                 users[uIdx].carriedOver = c;
+            }
+
+            if(window.pushData) window.pushData();
+            renderRoster(); // refresh UI
+            bootstrap.Modal.getInstance(document.getElementById('userProfileModal')).hide();
+        }
+        
+        // --- RESTORED MISSING FUNCTIONS ---
         function renderRoster() {
             const y = parseInt(document.getElementById("selYear").value);
             const m = parseInt(document.getElementById("selMonth").value);
@@ -946,9 +1608,9 @@
             let swapOnDays = [];
             if(conf.workWeekends && conf.workWeekends.length > 0) {
                  if(typeof conf.workWeekends[0] === 'object') {
-                     swapOnDays = conf.workWeekends.map(w => w.day);
+                       swapOnDays = conf.workWeekends.map(w => w.day);
                  } else {
-                     swapOnDays = conf.workWeekends;
+                       swapOnDays = conf.workWeekends;
                  }
             }
 
@@ -969,7 +1631,6 @@
 
             tbody.innerHTML = "";
             users.forEach(u => {
-                // Filter out Viewer from the Roster view
                 if(u.role === "VIEWER") return;
 
                 let rowHtml = `<tr data-uid="${u.id}"><td class="name-col" onclick="openUserProfile(${u.id})">${u.name}</td>`;
@@ -1017,27 +1678,26 @@
             });
         }
 
-        // --- EDIT LOGIC ---
         function openEdit(uId, day) {
-            // VIEWER MODIFICATION: Allow Viewers to open, but strictly readonly.
             const isViewer = currentUser.role === "VIEWER";
-
+            const isAdmin = currentUser.role === "ADMIN";
             const key = getKey();
             const existing = db[key]?.[uId]?.[day];
 
-            // Access Control Logic
-            if (!isViewer && currentUser.role !== "ADMIN") {
-                if (uId !== currentUser.id) {
-                    alert("Csak a saját sorodat szerkesztheted!"); return;
-                }
-                if (existing && existing.type !== 'PI' && existing.type !== 'PN' && !existing.start) {
-                    alert("Már van rögzített beosztás, csak az Admin módosíthatja!"); return;
-                }
+            if (!isViewer && !isAdmin) {
+                if (uId !== currentUser.id) return alert("Csak a saját sorodat szerkesztheted!");
             }
 
             document.getElementById("editUserId").value = uId;
             document.getElementById("editDay").value = day;
             document.getElementById("sportTime").value = ""; 
+
+            const restrictMsg = document.getElementById("userRestrictMsg");
+            if (!isAdmin && !isViewer) {
+                 restrictMsg.style.display = "block";
+            } else {
+                 restrictMsg.style.display = "none";
+            }
 
             if (existing) {
                 const rType = document.querySelector(`input[name="sType"][value="${existing.type}"]`);
@@ -1063,36 +1723,40 @@
             }
             toggleModalFields();
             
-            // VIEWER UI ADJUSTMENTS
             const modalTitle = document.getElementById("editModalTitle");
             const btnContainer = document.getElementById("editButtons");
-            const inputs = document.querySelectorAll("#editModalContent input, #editModalContent textarea");
+            const inputs = document.querySelectorAll("#editModalContent input");
+            const noteInput = document.getElementById("dayNote");
 
             if(isViewer) {
                 modalTitle.innerText = "Részletek Megtekintése (Csak Olvasható)";
-                modalTitle.className = "modal-title text-secondary fw-bold";
                 btnContainer.style.display = "none";
                 inputs.forEach(el => el.disabled = true);
+                noteInput.disabled = true;
+            } else if (!isAdmin) {
+                modalTitle.innerText = "Megjegyzés Hozzáadása";
+                btnContainer.style.display = "block";
+                inputs.forEach(el => el.disabled = true);
+                noteInput.disabled = false;
+                toggleModalFields();
             } else {
                 modalTitle.innerText = "Napi Beosztás Szerkesztése";
-                modalTitle.className = "modal-title";
                 btnContainer.style.display = "block";
                 inputs.forEach(el => el.disabled = false);
-                toggleModalFields(); // Re-run to handle enable/disable logic based on radio
+                noteInput.disabled = false;
+                toggleModalFields();
             }
 
             new bootstrap.Modal(document.getElementById('editModal')).show();
         }
 
         function toggleModalFields() {
-            // Re-check readonly status for Viewer to prevent re-enabling
             if(currentUser.role === "VIEWER") return; 
-
             const t = document.querySelector('input[name="sType"]:checked').value;
             const tf = document.getElementById("timeFields");
             const ov = document.getElementById("overtimeVal");
             
-            if(t === "B" || t === "TM") { ov.value = 0; ov.disabled = true; } else { ov.disabled = false; }
+            if(t === "B" || t === "TM") { ov.value = 0; ov.disabled = true; } else { if(currentUser.role === 'ADMIN') ov.disabled = false; }
             if(t==="WORK") { tf.style.display="block"; calcHours(); } 
             else { 
                 tf.style.display="none"; 
@@ -1146,259 +1810,134 @@
 
         function saveEntry() {
             if (currentUser.role === "VIEWER") return;
-
             const uId = document.getElementById("editUserId").value;
             const day = parseInt(document.getElementById("editDay").value);
             const key = getKey();
             
             const sportVal = parseInt(document.getElementById("sportTime").value) || 0;
-            if(sportVal > 0) {
+            if(sportVal > 0 && currentUser.role === 'ADMIN') { 
                 const y = parseInt(document.getElementById("selYear").value);
                 const m = parseInt(document.getElementById("selMonth").value);
                 const weeklySum = checkWeeklySportLimit(uId, y, m, day, sportVal);
                 
                 if(weeklySum > 120) {
-                    if(!confirm(`FIGYELEM!\nA heti sport limit (120 perc) túl lesz lépve!\n\nJelenlegi heti összesen (az új értékkel): ${weeklySum} perc.\n\nBiztosan rögzíted?`)) {
-                        return; 
-                    }
+                    if(!confirm(`FIGYELEM!\nA heti sport limit (120 perc) túl lesz lépve!\n\nJelenlegi heti összesen: ${weeklySum} perc.\n\nBiztosan rögzíted?`)) return; 
                 }
             }
 
             if(!db[key]) db[key] = {}; if(!db[key][uId]) db[key][uId] = {};
+            
+            const newNote = document.getElementById("dayNote").value.trim();
             const type = document.querySelector('input[name="sType"]:checked').value;
-            db[key][uId][day] = {
-                type: type,
-                start: type==="WORK"?document.getElementById("startTime").value:"",
-                end: type==="WORK"?document.getElementById("endTime").value:"",
-                hours: parseFloat(document.getElementById("calcHours").value)||0,
-                overtime: parseFloat(document.getElementById("overtimeVal").value)||0,
-                note: document.getElementById("dayNote").value.trim(),
-                sport: sportVal 
-            };
-            saveData(); renderRoster();
+            
+            // LOGGING - COMPARE OLD vs NEW
+            const oldEntry = db[key][uId][day] || { type:"", start:"", end:"", hours:0, overtime:0, note:"", sport:0 };
+            
+            let entry = {};
+            let logAction = "";
+            let logDetails = [];
+
+            if (currentUser.role !== 'ADMIN') {
+                // USER MODE
+                const existing = db[key][uId][day];
+                if(existing) {
+                    entry = { ...existing, note: newNote };
+                    if(existing.note !== newNote) logDetails.push(`Megj: "${existing.note}" -> "${newNote}"`);
+                    logAction = "Megjegyzés módosítása";
+                } else {
+                    entry = { type: "WORK", start:"", end:"", hours:0, overtime:0, note: newNote, sport:0 };
+                    logAction = "Új megjegyzés (üres napra)";
+                    logDetails.push(`"${newNote}"`);
+                }
+            } else {
+                // ADMIN MODE
+                const newStart = type==="WORK"?document.getElementById("startTime").value:"";
+                const newEnd = type==="WORK"?document.getElementById("endTime").value:"";
+                const newHours = parseFloat(document.getElementById("calcHours").value)||0;
+                const newOvertime = parseFloat(document.getElementById("overtimeVal").value)||0;
+
+                entry = {
+                    type: type,
+                    start: newStart,
+                    end: newEnd,
+                    hours: newHours,
+                    overtime: newOvertime,
+                    note: newNote,
+                    sport: sportVal 
+                };
+                
+                // Compare logic
+                const typeNames = { "WORK": "Szolgálat", "X": "Szabadság", "B": "Beteg", "RSZ": "Rendkívüli", "PN": "Pihenőnap", "PI": "Pihenőidő", "TM": "Megváltás" };
+
+                // 1. Service -> Absence
+                if(oldEntry.type === "WORK" && ["X", "B", "RSZ"].includes(type)) {
+                    const oldTime = `${oldEntry.start}-${oldEntry.end}`;
+                    const newLabel = typeNames[type] || type;
+                    logDetails.push(`Szolgálat (${oldTime}) -> ${newLabel}`);
+                } 
+                // 2. Absence -> Service (New Feature)
+                else if (["X", "B", "RSZ"].includes(oldEntry.type) && type === "WORK") {
+                     const oldLabel = typeNames[oldEntry.type] || oldEntry.type;
+                     logDetails.push(`${oldLabel} -> Szolgálat (${newStart}-${newEnd})`);
+                }
+                // 3. Generic Change
+                else if (oldEntry.type !== type) {
+                    logDetails.push(`Típus: ${oldEntry.type} -> ${type}`);
+                }
+
+                // Time change logic (only if still WORK)
+                if(type === "WORK" && oldEntry.type === "WORK" && (oldEntry.start !== newStart || oldEntry.end !== newEnd)) {
+                     logDetails.push(`Idő: ${oldEntry.start}-${oldEntry.end} -> ${newStart}-${newEnd}`);
+                }
+                
+                if(oldEntry.overtime != newOvertime) logDetails.push(`Túlsz: ${oldEntry.overtime} -> ${newOvertime}`);
+                
+                // Sport Change - Only if changed from non-zero to zero or vice versa or changed value
+                const oldSport = parseInt(oldEntry.sport) || 0;
+                const newSport = parseInt(sportVal) || 0;
+                if(oldSport !== newSport) {
+                     logDetails.push(`Sport: ${oldSport}p -> ${newSport}p`);
+                }
+
+                if(oldEntry.note !== newNote) logDetails.push(`Megj: ...`);
+
+                logAction = `Módosítás`;
+            }
+
+            db[key][uId][day] = entry;
+            
+            // LOGGING
+            const targetUser = users.find(x => x.id == uId);
+            const y = document.getElementById("selYear").value;
+            const m = parseInt(document.getElementById("selMonth").value) + 1;
+            const dateStr = `${y}-${m}-${day}`;
+            
+            if(logDetails.length > 0) {
+                 logHistory(targetUser ? targetUser.name : "???", dateStr, logAction, logDetails.join(", "));
+            }
+
+            if(window.pushData) window.pushData(); renderRoster();
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
         }
+
         function deleteEntry() {
             if (currentUser.role === "VIEWER") return;
-
             const uId = document.getElementById("editUserId").value;
             if (currentUser.role !== "ADMIN" && uId != currentUser.id) return;
             if(currentUser.role !== "ADMIN") { alert("Törlést csak Admin végezhet."); return; }
 
             const day = document.getElementById("editDay").value;
             const key = getKey();
-            if(db[key] && db[key][uId]) delete db[key][uId][day];
-            saveData(); renderRoster();
+            if(db[key] && db[key][uId]) {
+                 delete db[key][uId][day];
+                 const targetUser = users.find(x => x.id == uId);
+                 const y = document.getElementById("selYear").value;
+                 const m = parseInt(document.getElementById("selMonth").value) + 1;
+                 const dateStr = `${y}-${m}-${day}`;
+                 logHistory(targetUser ? targetUser.name : "???", dateStr, "Törlés", "Teljes bejegyzés törölve");
+            }
+            if(window.pushData) window.pushData(); renderRoster();
             bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-        }
-
-        // --- ABSENCE & SPORT STATISTICS ---
-        function openAbsenceStats() {
-            const y = parseInt(document.getElementById("selYear").value);
-            const mIdx = parseInt(document.getElementById("selMonth").value);
-            const mName = document.getElementById("selMonth").options[mIdx].text;
-            const key = getKey();
-            const monthData = db[key] || {};
-            const daysInMonth = new Date(y, mIdx + 1, 0).getDate();
-
-            document.getElementById("absenceStatsTitle").innerText = `${y}. ${mName} - Havi Távollét & Sport Statisztika`;
-            const tbody = document.getElementById("absenceStatsBody");
-            tbody.innerHTML = "";
-
-            users.forEach(u => {
-                if(u.role === "VIEWER") return;
-
-                let countX = 0, countB = 0, countRSZ = 0, countTM = 0;
-                let totalSportMins = 0;
-                let weeklySport = {}; 
-                let currentWeek = 1;
-                
-                for(let d=1; d<=daysInMonth; d++) {
-                     let date = new Date(y, mIdx, d);
-                     if(!weeklySport[currentWeek]) weeklySport[currentWeek] = 0;
-                     const uData = monthData[u.id] || {};
-                     const entry = uData[d];
-                     if(entry) {
-                        if(entry.type === 'X') countX++;
-                        else if(entry.type === 'B') countB++;
-                        else if(entry.type === 'RSZ') countRSZ++;
-                        else if(entry.type === 'TM') countTM++;
-                        if(entry.sport) {
-                            const sm = parseInt(entry.sport);
-                            totalSportMins += sm;
-                            weeklySport[currentWeek] += sm;
-                        }
-                     }
-                     if(date.getDay() === 0) currentWeek++;
-                }
-
-                let weekStr = "";
-                Object.keys(weeklySport).forEach(w => {
-                    const val = weeklySport[w];
-                    if(val > 0) weekStr += `${w}.hét: ${val}p, `;
-                });
-                if(weekStr.endsWith(", ")) weekStr = weekStr.slice(0, -2);
-
-                const totalAbsence = countX + countB + countRSZ + countTM;
-                const hasSport = totalSportMins > 0;
-                const hasAbsence = totalAbsence > 0;
-
-                if(hasSport || hasAbsence) {
-                    let sportDisplay = `<span class="text-muted">-</span>`;
-                    if(hasSport) {
-                        sportDisplay = `<strong class="text-primary fs-6">${totalSportMins} perc</strong><br><small class="text-muted" style="font-size:0.75em">${weekStr}</small>`;
-                    }
-                    tbody.innerHTML += `<tr>
-                        <td class="text-start fw-bold">${u.name}</td>
-                        <td>${countX > 0 ? countX : '<span class="text-muted">-</span>'}</td>
-                        <td>${countB > 0 ? countB : '<span class="text-muted">-</span>'}</td>
-                        <td>${countRSZ > 0 ? countRSZ : '<span class="text-muted">-</span>'}</td>
-                        <td>${countTM > 0 ? countTM : '<span class="text-muted">-</span>'}</td>
-                        <td class="align-middle">${sportDisplay}</td>
-                        <td class="fw-bold text-danger align-middle">${totalAbsence} nap</td>
-                    </tr>`;
-                }
-            });
-
-            if(tbody.innerHTML === "") {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Ebben a hónapban még nincs rögzítve adat (Távollét vagy Sport).</td></tr>`;
-            }
-            new bootstrap.Modal(document.getElementById('absenceStatsModal')).show();
-        }
-
-        // --- USER PROFILE & PASSWORD ---
-        function openUserProfile(uId) {
-            const u = users.find(x => x.id == uId);
-            if(!u) return;
-
-            document.getElementById("profileUserId").value = u.id;
-            document.getElementById("profileName").innerText = u.name;
-            document.getElementById("profileLogin").innerText = `Login: ${u.login} | Jogkör: ${u.role}`;
-            document.getElementById("profileMessage").innerText = "";
-            document.getElementById("profileOldPass").value = "";
-            document.getElementById("profileNewPass").value = "";
-            
-            const isAdmin = currentUser.role === "ADMIN";
-            const isSelf = currentUser.id == uId;
-            
-            const adminPanel = document.getElementById("adminProfilePanel");
-            const quotaInput = document.getElementById("profileQuotaInput");
-            const carriedInput = document.getElementById("profileCarriedInput");
-            
-            if (isAdmin) {
-                adminPanel.style.display = "block";
-                quotaInput.value = u.quota || 20;
-                carriedInput.value = u.carriedOver || 0;
-            } else {
-                adminPanel.style.display = "none";
-            }
-
-            document.getElementById("oldPassDiv").style.display = (isAdmin && !isSelf) ? "none" : "block";
-            document.getElementById("adminOverrideDiv").style.display = (isAdmin && !isSelf) ? "block" : "none";
-
-            const y = parseInt(document.getElementById("selYear").value);
-            document.getElementById("profileYear").innerText = y;
-            const quota = parseInt(u.quota) || 20;
-            const carried = parseInt(u.carriedOver) || 0;
-            const totalAvailable = quota + carried;
-            const used = calculateUsedLeave(u.id, y);
-            
-            document.getElementById("profileLeaveStats").innerText = `${used} / ${totalAvailable}`;
-            document.getElementById("profileLeaveBreakdown").innerHTML = `Idei: <b>${quota}</b> + Áthozott: <b>${carried}</b> = Összesen: <b>${totalAvailable}</b>`;
-
-            let pct = (used / totalAvailable) * 100;
-            if(pct > 100) pct = 100;
-            const bar = document.getElementById("profileLeaveProgress");
-            bar.style.width = pct + "%";
-            bar.className = (used > totalAvailable) ? "progress-bar bg-danger" : "progress-bar bg-success";
-            
-            const warn = document.getElementById("leaveWarning");
-            if(used > totalAvailable) {
-                warn.innerText = `FIGYELEM! A szabadság keret túllépve ${used - totalAvailable} nappal!`;
-                warn.style.display = "block";
-            } else {
-                warn.style.display = "none";
-            }
-            new bootstrap.Modal(document.getElementById('userProfileModal')).show();
-        }
-
-        function calculateUsedLeave(uId, year) {
-            let used = 0;
-            for(let m=1; m<=12; m++) {
-                const k = `${year}-${m}`;
-                if(db[k] && db[k][uId]) {
-                    Object.values(db[k][uId]).forEach(entry => {
-                        if(entry.type === 'X') used++;
-                    });
-                }
-            }
-            return used;
-        }
-
-        function saveProfileChanges() {
-            const uId = document.getElementById("profileUserId").value;
-            const newPass = document.getElementById("profileNewPass").value.trim();
-            const oldPass = document.getElementById("profileOldPass").value.trim();
-            const msg = document.getElementById("profileMessage");
-            const idx = users.findIndex(x => x.id == uId);
-            if(idx === -1) return;
-
-            let changesMade = false;
-            if(currentUser.role === "ADMIN") {
-                const newQuota = parseInt(document.getElementById("profileQuotaInput").value);
-                const newCarried = parseInt(document.getElementById("profileCarriedInput").value);
-                
-                if(!isNaN(newQuota) && newQuota !== users[idx].quota) {
-                    users[idx].quota = newQuota;
-                    changesMade = true;
-                }
-                if(!isNaN(newCarried) && newCarried !== users[idx].carriedOver) {
-                    users[idx].carriedOver = newCarried;
-                    changesMade = true;
-                }
-            }
-
-            if(newPass) {
-                const isAdmin = currentUser.role === "ADMIN";
-                const isSelf = currentUser.id == uId;
-                
-                if (currentUser.role === "VIEWER" && !isSelf) return;
-
-                if(isAdmin && !isSelf) {
-                    users[idx].pass = newPass;
-                    changesMade = true;
-                } else {
-                    if(users[idx].pass === oldPass) {
-                        users[idx].pass = newPass;
-                        changesMade = true;
-                    } else {
-                        msg.className = "text-danger fw-bold";
-                        msg.innerText = "Hiba: A régi jelszó nem megfelelő!";
-                        return;
-                    }
-                }
-            }
-
-            if(changesMade) {
-                saveData();
-                msg.className = "text-success fw-bold";
-                msg.innerText = "Sikeres mentés!";
-                setTimeout(() => {
-                    const u = users[idx];
-                    const y = parseInt(document.getElementById("selYear").value);
-                    const quota = parseInt(u.quota) || 20;
-                    const carried = parseInt(u.carriedOver) || 0;
-                    const total = quota + carried;
-                    const used = calculateUsedLeave(u.id, y);
-                    
-                    document.getElementById("profileLeaveStats").innerText = `${used} / ${total}`;
-                    document.getElementById("profileLeaveBreakdown").innerHTML = `Idei: <b>${quota}</b> + Áthozott: <b>${carried}</b> = Összesen: <b>${total}</b>`;
-                    renderRoster();
-                    if(document.getElementById("tab-users").classList.contains("active")) renderSettings();
-                }, 500);
-            } else {
-                msg.innerText = "Nincs változás.";
-            }
         }
 
         // --- BATCH & PRINT ---
@@ -1409,8 +1948,7 @@
              new bootstrap.Modal(document.getElementById('colBatchModal')).show();
         }
         function toggleColBatchTime() {
-             const t = document.getElementById("colBatchType").value;
-             document.getElementById("colBatchTimeDiv").style.display = (t === "WORK") ? "block" : "none";
+             const t = document.getElementById("colBatchType").value; document.getElementById("colBatchTimeDiv").style.display = (t === "WORK") ? "block" : "none";
         }
         function saveColBatch() {
              const day = document.getElementById("colBatchDay").value;
@@ -1427,7 +1965,13 @@
                  } else if (type === "X" || type === "B" || type === "RSZ") { entry.hours = 8; }
                  db[key][u.id][day] = entry;
              });
-             saveData(); renderRoster();
+             
+             // Simple Batch Log
+             const y = document.getElementById("selYear").value;
+             const m = parseInt(document.getElementById("selMonth").value) + 1;
+             logHistory("MINDENKI", `${y}-${m}-${day}`, `Csoportos: ${type}`, "Mindenki felülírva");
+
+             if(window.pushData) window.pushData(); renderRoster();
              bootstrap.Modal.getInstance(document.getElementById('colBatchModal')).hide();
         }
         
@@ -1486,10 +2030,17 @@
                     db[key][u.id][i] = entry;
                 }
             });
-            saveData(); renderRoster(); alert("Sikeres rögzítés!");
+
+            // Batch Log
+            const y = document.getElementById("selYear").value;
+            const m = parseInt(document.getElementById("selMonth").value) + 1;
+            const targetName = (uId === "ALL") ? "MINDENKI" : (users.find(x=>x.id==uId)?.name || "???");
+            logHistory(targetName, `${y}-${m} (${startD}-${endD})`, `Többnapos: ${type}`);
+
+            if(window.pushData) window.pushData(); renderRoster(); alert("Sikeres rögzítés!");
         }
 
-        // --- SETTINGS (Users & Batch) ---
+        // --- SETTINGS ---
         function renderSettings() {
             const tb = document.getElementById("userSettingsTable"); tb.innerHTML = "";
             const currentYear = parseInt(document.getElementById("selYear").value);
@@ -1505,13 +2056,7 @@
                 tb.innerHTML += `<tr>
                     <td><input type="text" class="form-control form-control-sm" value="${u.name}" onchange="updateUser(${idx},'name',this.value)"></td>
                     <td><input type="text" class="form-control form-control-sm" value="${u.login}" onchange="updateUser(${idx},'login',this.value)"></td>
-                    <!-- PASSWORD FIELD MODIFIED FOR SECURITY -->
-                    <td>
-                        <input type="text" class="form-control form-control-sm border-warning" 
-                               placeholder="Új jelszó..." 
-                               onchange="updateUserPass(${idx}, this.value)" 
-                               title="A régi jelszó rejtett. Írj be újat a cseréhez.">
-                    </td>
+                    <td><input type="text" class="form-control form-control-sm border-warning" placeholder="Új jelszó..." onchange="updateUserPass(${idx}, this.value)"></td>
                     <td><select class="form-select form-select-sm" onchange="updateUser(${idx},'role',this.value)">
                         <option value="USER" ${u.role==='USER'?'selected':''}>User</option>
                         <option value="VIEWER" ${u.role==='VIEWER'?'selected':''}>Betekintő</option>
@@ -1534,11 +2079,8 @@
             const val = parseInt(document.getElementById("batchQuotaInput").value);
             if(!val || val < 1) return alert("Érvényes számot adj meg!");
             if(!confirm(`Biztosan beállítod MINDEN felhasználónak a(z) ${val} napos keretet?`)) return;
-            
             users.forEach(u => u.quota = val);
-            saveData();
-            renderSettings();
-            alert("Sikeres csoportos beállítás!");
+            if(window.pushData) window.pushData(); renderSettings(); alert("Sikeres csoportos beállítás!");
         }
 
         function addNewUser() {
@@ -1548,40 +2090,32 @@
             const role = document.getElementById("newUserRole").value;
             const quota = document.getElementById("newUserQuota").value || 20;
             const carried = document.getElementById("newUserCarried").value || 0;
-            
             if(!name || !login || !pass) return alert("Minden mező kötelező!");
             users.push({ id: Date.now(), name, login, pass, role, balance: 0, quota: parseInt(quota), carriedOver: parseInt(carried) });
-            
             document.getElementById("newUserName").value = "";
             document.getElementById("newUserLogin").value = "";
             document.getElementById("newUserPass").value = "";
-            
-            saveData(); renderSettings(); renderBatchSelect(); renderRoster();
+            if(window.pushData) window.pushData(); renderSettings(); renderBatchSelect(); renderRoster();
         }
         function updateUser(idx, field, val) { 
             if(field === 'quota' || field === 'carriedOver') val = parseInt(val);
             users[idx][field] = val; 
-            saveData(); 
-            if(field === 'quota' || field === 'carriedOver') renderSettings();
-            else renderRoster(); 
+            if(window.pushData) window.pushData(); 
+            if(field === 'quota' || field === 'carriedOver') renderSettings(); else renderRoster(); 
         }
-
-        // New specific function for password update to avoid overwriting with empty
         function updateUserPass(idx, val) {
             if(val && val.trim() !== "") {
                 users[idx].pass = val.trim();
-                saveData();
+                if(window.pushData) window.pushData();
                 alert("Jelszó sikeresen módosítva!");
             }
         }
-
-        function deleteUser(idx) { if(confirm("Törlés?")) { users.splice(idx, 1); saveData(); renderSettings(); renderRoster(); } }
+        function deleteUser(idx) { if(confirm("Törlés?")) { users.splice(idx, 1); if(window.pushData) window.pushData(); renderSettings(); renderRoster(); } }
 
         function loadConfigForPeriod() {
             const key = getKey();
             const c = configs[key] || { norma: null, holidays: [], workWeekends: [] };
             document.getElementById("configHolidays").value = c.holidays.join(", ");
-            
             if(c.workWeekends) {
                 const wwStr = c.workWeekends.map(w => {
                     if(typeof w === 'object') {
@@ -1593,13 +2127,11 @@
             } else {
                 document.getElementById("configWorkWeekends").value = "";
             }
-
             if(c.norma) document.getElementById("configNorma").value = c.norma; else calculateNormaForUI(true);
         }
         function saveMonthConfig() {
             const key = getKey();
             const hol = document.getElementById("configHolidays").value.split(",").map(x => parseInt(x.trim())).filter(x => !isNaN(x));
-            
             const wwInput = document.getElementById("configWorkWeekends").value;
             const ww = wwInput.split(",").map(s => {
                 s = s.trim();
@@ -1614,16 +2146,82 @@
                     return (!isNaN(d)) ? { day: d, swap: null } : null;
                 }
             }).filter(x => x !== null);
-
             configs[key] = { norma: parseInt(document.getElementById("configNorma").value), holidays: hol, workWeekends: ww };
-            saveData(); renderRoster();
+            if(window.pushData) window.pushData(); renderRoster();
         }
 
-        // --- IO (Firebase replaced localStorage) ---
-        function saveData() { 
-            if(window.pushData) window.pushData();
-        }
+        // --- STATS LOGIC ---
+        function openAbsenceStats() {
+            const y = parseInt(document.getElementById("selYear").value);
+            const mIdx = parseInt(document.getElementById("selMonth").value);
+            const mName = document.getElementById("selMonth").options[mIdx].text;
+            const key = getKey();
+            const monthData = db[key] || {};
+            const daysInMonth = new Date(y, mIdx + 1, 0).getDate();
 
+            document.getElementById("absenceStatsTitle").innerText = `${y}. ${mName} - Havi Távollét & Sport Statisztika`;
+            const tbody = document.getElementById("absenceStatsBody");
+            tbody.innerHTML = "";
+
+            users.forEach(u => {
+                if(u.role === "VIEWER") return;
+                let countX = 0, countB = 0, countRSZ = 0, countTM = 0;
+                let totalSportMins = 0;
+                let weeklySport = {}; 
+                let currentWeek = 1;
+                
+                for(let d=1; d<=daysInMonth; d++) {
+                      let date = new Date(y, mIdx, d);
+                      if(!weeklySport[currentWeek]) weeklySport[currentWeek] = 0;
+                      const uData = monthData[u.id] || {};
+                      const entry = uData[d];
+                      if(entry) {
+                         if(entry.type === 'X') countX++;
+                         else if(entry.type === 'B') countB++;
+                         else if(entry.type === 'RSZ') countRSZ++;
+                         else if(entry.type === 'TM') countTM++;
+                         if(entry.sport) {
+                            const sm = parseInt(entry.sport);
+                            totalSportMins += sm;
+                            weeklySport[currentWeek] += sm;
+                         }
+                      }
+                      if(date.getDay() === 0) currentWeek++;
+                }
+
+                let weekStr = "";
+                Object.keys(weeklySport).forEach(w => {
+                    const val = weeklySport[w];
+                    if(val > 0) weekStr += `${w}.hét: ${val}p, `;
+                });
+                if(weekStr.endsWith(", ")) weekStr = weekStr.slice(0, -2);
+
+                const totalAbsence = countX + countB + countRSZ + countTM;
+                const hasSport = totalSportMins > 0;
+                const hasAbsence = totalAbsence > 0;
+
+                if(hasSport || hasAbsence) {
+                    let sportDisplay = `<span class="text-muted">-</span>`;
+                    if(hasSport) {
+                        sportDisplay = `<strong class="text-primary fs-6">${totalSportMins} perc</strong><br><small class="text-muted" style="font-size:0.75em">${weekStr}</small>`;
+                    }
+                    tbody.innerHTML += `<tr>
+                        <td class="text-start fw-bold">${u.name}</td>
+                        <td>${countX > 0 ? countX : '<span class="text-muted">-</span>'}</td>
+                        <td>${countB > 0 ? countB : '<span class="text-muted">-</span>'}</td>
+                        <td>${countRSZ > 0 ? countRSZ : '<span class="text-muted">-</span>'}</td>
+                        <td>${countTM > 0 ? countTM : '<span class="text-muted">-</span>'}</td>
+                        <td class="align-middle">${sportDisplay}</td>
+                        <td class="fw-bold text-danger align-middle">${totalAbsence} nap</td>
+                    </tr>`;
+                }
+            });
+
+            if(tbody.innerHTML === "") {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Ebben a hónapban még nincs rögzítve adat (Távollét vagy Sport).</td></tr>`;
+            }
+            new bootstrap.Modal(document.getElementById('absenceStatsModal')).show();
+        }
     </script>
 </body>
 </html>
